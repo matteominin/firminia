@@ -21,8 +21,8 @@ export class BodyComponent implements OnDestroy {
   private chunks: Blob[] = [];
   private mimeType = '';
 
-  // Cambia con il tuo endpoint
-  private readonly uploadUrl = 'audio';
+  // TO_DO: cambia con l URL del tuo server
+  private readonly uploadUrl = 'https://api.openai.com/v1/audio/speech';
 
   constructor(private http: HttpClient) {}
 
