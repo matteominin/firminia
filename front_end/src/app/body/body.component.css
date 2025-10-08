@@ -1,0 +1,21 @@
+.wrap {
+    height: 80vh;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .btn {
+    border: none;
+    border-radius: 999px;
+    padding: 1rem 2rem;
+    font-size: 1.05rem;
+    cursor: pointer;
+    background: #1e88e5;
+    color: #fff;
+  }
+  .btn:disabled { opacity: .7; cursor: not-allowed; }
+  
+  .status { font-size: .95rem; }
+  

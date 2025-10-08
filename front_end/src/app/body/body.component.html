@@ -1,0 +1,12 @@
+<div class="wrap">
+    <button class="btn"
+            (click)="onToggle()"
+            [disabled]="isSending()">
+      {{ isRecording() ? '■ Ferma e invia' : '🎙️ Avvia registrazione' }}
+    </button>
+  
+    <p class="status" *ngIf="statusMsg()">
+      {{ statusMsg() }}
+    </p>
+  </div>
+  
