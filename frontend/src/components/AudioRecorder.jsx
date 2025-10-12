@@ -65,6 +65,11 @@ const AudioRecorder = () => {
   const handleRealtimeEvent = (event) => {
     console.log('Realtime event:', event.type, event);
 
+    // Log all function/tool related events for debugging
+    if (event.type.includes('function') || event.type.includes('tool')) {
+      console.log('🔧 TOOL EVENT:', event.type, JSON.stringify(event, null, 2));
+    }
+
     switch (event.type) {
       case 'session.created':
         setStatus('Connected');
@@ -107,7 +112,72 @@ const AudioRecorder = () => {
         console.log('Audio transcript completed');
         break;
 
+      case 'response.function_call_arguments.delta':
+        console.log('Function call arguments delta:', event);
+        break;
+
+      case 'response.function_call_arguments.done':
+        console.log('Function call completed:', event);
+        addTranscript('system', `[Executing tool: ${event.name || 'unknown'}...]`);
+        break;
+
+      case 'response.output_item.added':
+        console.log('Output item added:', event);
+        if (event.item?.type === 'function_call') {
+          addTranscript('system', `[Calling tool: ${event.item.name}]`);
+        }
+        break;
+
+      case 'response.output_item.done':
+        console.log('Output item done:', event);
+        if (event.item?.type === 'function_call') {
+          addTranscript('system', `[Tool ${event.item.name} completed]`);
+        }
+        // After function call completes, explicitly continue the response
+        if (event.item?.type === 'function_call' && dataChannelRef.current?.readyState === 'open') {
+          console.log('Sending response.create after function call');
+          const responseCreate = {
+            type: 'response.create',
+          };
+          dataChannelRef.current.send(JSON.stringify(responseCreate));
+        }
+        break;
+
+      case 'conversation.item.created':
+        console.log('Conversation item created:', event);
+        if (event.item?.type === 'function_call_output') {
+          addTranscript('system', `[Tool result received]`);
+          // Trigger response after receiving function output
+          if (dataChannelRef.current?.readyState === 'open') {
+            console.log('Sending response.create after function output');
+            const responseCreate = {
+              type: 'response.create',
+            };
+            dataChannelRef.current.send(JSON.stringify(responseCreate));
+          }
+        }
+        break;
+
+      case 'response.mcp_call.in_progress':
+        console.log('MCP call in progress:', event);
+        addTranscript('system', `[Executing MCP tool...]`);
+        break;
+
+      case 'response.mcp_call.completed':
+        console.log('MCP call completed:', event);
+        addTranscript('system', `[MCP tool completed]`);
+        // After MCP call completes, trigger a new response to process the results
+        if (dataChannelRef.current?.readyState === 'open') {
+          console.log('Sending response.create after MCP call completion');
+          const responseCreate = {
+            type: 'response.create',
+          };
+          dataChannelRef.current.send(JSON.stringify(responseCreate));
+        }
+        break;
+
       case 'response.done':
+        console.log('Response done:', event);
         setStatus('Ready - Speak now!');
         break;
 

@@ -35,6 +35,14 @@ app.get('/session', async (_req, res) => {
       body: JSON.stringify({
         model: 'gpt-4o-realtime-preview-2024-12-17',
         voice: 'alloy',
+        tools: [
+          {
+            type: "mcp",
+            server_label: "askme",
+            server_url: "https://3545b3d93741.ngrok-free.app/sse",
+            require_approval: "never"
+          }
+        ],
       }),
     });
 

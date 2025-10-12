@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.lascaux.firminia.model.Document;
 import com.lascaux.firminia.model.Guest;
 
+import jakarta.validation.Valid;
+
 @RestController
 public class FirminiaController {
     
@@ -28,7 +30,7 @@ public class FirminiaController {
     }
 
     @PostMapping("/create-guest-ticket")
-    public String createGuestTicket(@RequestBody Guest guest) {
+    public String createGuestTicket(@Valid @RequestBody Guest guest) {
         return "Guest ticket created for " + guest.name() + " " + guest.surname() + "\nEmail: " + guest.email() + "\nPhone: " + guest.phone();
     }
 }
